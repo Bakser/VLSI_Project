@@ -191,6 +191,7 @@ inline void merge(int x,int y){
 	}
 	if(tmp.edgeType=="I"){//???
 		I[v]+=w;
+		I[u]-=w;
 		tmp.del=1;
 	}
 	if(tmp.edgeType=="R"&&w==0.0){

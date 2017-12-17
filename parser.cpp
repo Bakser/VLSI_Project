@@ -200,10 +200,12 @@ inline void merge(int x,int y){
    //out_file << EdgeList[i].edgeType <<i+1<< " " << (*sourceNum).second << " " << (*sinkNum).second << " " << EdgeList[i].branchValue << endl;  
   }  
   for(int i(0);i<=NumOfNodes;i++)
-	  if(find(i)==i){
-		Real[i]=cnt_real++;
-		if(fixedV.count(i))
-			cnt_fixed++;
+	  if(fa.count(i)){
+		if(find(i)==i){
+			Real[i]=cnt_real++;
+			if(fixedV.count(i))
+				cnt_fixed++;
+		}
 	  }
   for(int i(0);i<EdgeList.size();i++)
 	if(!EdgeList[i].del){
@@ -220,13 +222,17 @@ inline void merge(int x,int y){
 	}
   out_file<<cnt_real<<endl;
   for(int i(0);i<=NumOfNodes;i++)
-	  if(find(i)==i){
-		  out_file<<I[i]<<" "<<G[Real[i]]<<endl;
+	  if(fa.count(i)){
+		if(find(i)==i){
+			out_file<<I[i]<<" "<<G[Real[i]]<<endl;
+		}
 	  }
   out_file<<cnt_fixed<<endl;
   for(int i(0);i<=NumOfNodes;i++)
-	  if(find(i)==i&&fixedV.count(i)){
-		out_file<<Real[i]<<" "<<fixedV[i]<<endl;
+	  if(fa.count(i)){
+		if(find(i)==i&&fixedV.count(i)){
+			out_file<<Real[i]<<" "<<fixedV[i]<<endl;
+		}
 	  }
   out_file<<cnt_edges<<endl;
 	for(int i(0);i<cnt_real;i++)

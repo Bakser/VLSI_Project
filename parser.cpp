@@ -3,7 +3,8 @@
  #include <sstream>  
  #include <vector>  
  #include <set>  
- #include <map>  
+ #include <map> 
+#include <iomanip>
  #include <utility>  
    
  #include <cstdlib>  
@@ -12,12 +13,13 @@
    
    
  #include "parser_PG.hpp"  
-   
+typedef long double LD;
+
  typedef map<string,int>::value_type entry;  
 map<int,int> fa,Real;
-map<int,double> I,fixedV,edges[2000000],G;
+map<int,LD> I,fixedV,edges[2000000],G;
 int cnt_real=0,cnt_fixed=0,cnt_edges=0;
-inline void addedge(int u,int v,double w){
+inline void addedge(int u,int v,LD w){
 	if(!edges[u].count(v)){
 		edges[u][v]=0.0;
 		cnt_edges++;
@@ -48,11 +50,12 @@ inline void merge(int x,int y){
    cout<<"Error: circuit file not found"<<endl;  
    exit(1);  
   }  
-     
+
   ifstream in_file(argv[1]);  
   ofstream out_file(argv[2]);   
   ofstream out_map(argv[3]);  
-    
+	out_file.setf(ios::fixed,ios::floatfield);
+	out_file.precision(10);
   if(!in_file.is_open() || !out_file.is_open())  
   {  
    cout<<"Error: Can't open input file"<<endl;  
@@ -70,11 +73,11 @@ inline void merge(int x,int y){
   const string delim("*");  
   string::size_type begIdx, endIdx;  
     
-  uint NumOfEdges=0;  
-  uint NumOfNodes=0;  
-  uint NumOfCurrentSors=0;  
-  uint NumOfVoltageSors=0;  
-  uint NumOfResistance=0;  
+  unsigned int NumOfEdges=0;  
+  unsigned int NumOfNodes=0;  
+  unsigned int NumOfCurrentSors=0;  
+  unsigned int NumOfVoltageSors=0;  
+  unsigned int NumOfResistance=0;  
     
   while(!in_file.eof())  
   {  
@@ -178,7 +181,7 @@ inline void merge(int x,int y){
    }  
     parser_PG& tmp=EdgeList[i];
 	int u=find((*sourceNum).second),v=find((*sinkNum).second);
-	double w=tmp.branchValue;
+	LD w=tmp.branchValue;
 	if(tmp.edgeType=="V"){
 		if(w==0.0){
 			merge(u,v);
@@ -214,7 +217,7 @@ inline void merge(int x,int y){
 		sinkNum = symToNum.find(EdgeList[i].sinkSymbol);
 		parser_PG& tmp=EdgeList[i];
 		int u=Real[find((*sourceNum).second)],v=Real[find((*sinkNum).second)];
-		double w=tmp.branchValue;
+		LD w=tmp.branchValue;
 		if(tmp.edgeType=="R"){
 			addedge(u,v,1.0/w);
 			addedge(v,u,1.0/w);
@@ -237,7 +240,7 @@ inline void merge(int x,int y){
 	  }
   out_file<<cnt_edges<<endl;
 	for(int i(0);i<cnt_real;i++)
-		for(map<int,double>::iterator it=edges[i].begin();it!=edges[i].end();it++)
+		for(map<int,LD>::iterator it=edges[i].begin();it!=edges[i].end();it++)
 			out_file<<i<<" "<<it->first<<" "<<it->second<<endl;
   //out_file << ".end";  
 	for(map<string,int>::iterator it=symToNum.begin();it!=symToNum.end();it++)

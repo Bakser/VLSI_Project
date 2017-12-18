@@ -14,11 +14,14 @@
    
  #include "parser_PG.hpp"  
 typedef long double LD;
-
+LD eps(1e-7);
  typedef map<string,int>::value_type entry;  
 map<int,int> fa,Real;
 map<int,LD> I,fixedV,edges[2000000],G;
 int cnt_real=0,cnt_fixed=0,cnt_edges=0;
+inline bool equal(LD a,LD b){
+	return (a-b)>=-eps&&(a-b)<=eps;
+}
 inline void addedge(int u,int v,LD w){
 	if(!edges[u].count(v)){
 		edges[u][v]=0.0;
@@ -56,7 +59,10 @@ inline void merge(int x,int y){
   ofstream out_map(argv[3]);  
 	out_file.setf(ios::fixed,ios::floatfield);
 	out_file.precision(10);
-  if(!in_file.is_open() || !out_file.is_open())  
+ 	cout.setf(ios::fixed,ios::floatfield);
+	cout.precision(10);
+  
+if(!in_file.is_open() || !out_file.is_open())  
   {  
    cout<<"Error: Can't open input file"<<endl;  
    exit(1);  
@@ -197,8 +203,9 @@ inline void merge(int x,int y){
 		I[u]-=w;
 		tmp.del=1;
 	}
-	if(tmp.edgeType=="R"&&w==0.0){
+	if(tmp.edgeType=="R"&&equal(w,0.0)){
 		merge(u,v);
+		//cout<<"???"<<endl;
 		tmp.del=1;
 	}
    //out_file << EdgeList[i].edgeType <<i+1<< " " << (*sourceNum).second << " " << (*sinkNum).second << " " << EdgeList[i].branchValue << endl;  
@@ -225,12 +232,15 @@ inline void merge(int x,int y){
 		else cout<<"FUCK";
 	}
   out_file<<cnt_real<<endl;
+  LD S=0.0;
   for(int i(0);i<=NumOfNodes;i++)
 	  if(fa.count(i)){
 		if(find(i)==i){
 			out_file<<I[i]<<" "<<G[Real[i]]<<endl;
+			S+=I[i];
 		}
 	  }
+	cout<<S<<endl;
   out_file<<cnt_fixed<<endl;
   for(int i(0);i<=NumOfNodes;i++)
 	  if(fa.count(i)){
@@ -239,9 +249,19 @@ inline void merge(int x,int y){
 		}
 	  }
   out_file<<cnt_edges<<endl;
-	for(int i(0);i<cnt_real;i++)
-		for(map<int,LD>::iterator it=edges[i].begin();it!=edges[i].end();it++)
+	for(int i(0);i<cnt_real;i++){
+		LD sum=0.0;
+		for(map<int,LD>::iterator it=edges[i].begin();it!=edges[i].end();it++){
 			out_file<<i<<" "<<it->first<<" "<<it->second<<endl;
+			sum+=it->second;
+			if(!equal(it->second,edges[it->first][i])){
+				cout<<"WCNM"<<endl;
+			}
+		}
+		if(!equal(sum,G[i])){
+			cout<<G[i]<<" "<<sum<<endl;
+		}
+	}
   //out_file << ".end";  
 	for(map<string,int>::iterator it=symToNum.begin();it!=symToNum.end();it++)
 		out_map<<it->first<<" "<<Real[find(it->second)]<<endl;
